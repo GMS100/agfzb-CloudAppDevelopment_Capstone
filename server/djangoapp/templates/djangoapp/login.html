@@ -22,7 +22,7 @@
             <div class='nav navbar-nav navbar-right'>
                 <a class='btn btn-link' href="{% url 'djangoapp:about' %}">About Us</a> 
             </div>
-            <ul class="nav navbar-nav navbar-right">
+<!--            <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
                 <li>
                     <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
@@ -41,27 +41,29 @@
                     </form>
                 </li>
                 {% endif %}
-            </ul>            
+            </ul>    -->        
         </div>
     </nav>
-
+    
     <!-- Page Content -->
-<!--    <div class="container-fluid"> -->
-    <div class="container">
-        </br></br>
-        <address>
-            <div class="text-center">
-            <p class="text-lg-center font-weight-bold">Contact us!</p>
-            <a class="text-md-center font-weight-bold">Best Cars</a>
-            <div class="text-sm-center">
-                <a>123 Main St</a></br>
-                <a>Anywhere, AZ 98654</a></br>
-                <a>Phone: (123) 456-7890</a></br>
-                <a>Email: </a><a href="mailto:#">BestCars@fake.com</a>
+    <form action="{% url 'djangoapp:login' %}" method="post">
+        {% csrf_token %}
+        <div class="container"> 
+            <h1>Login</h1>
+            <div class="form-group"> 
+              <label for="username"><b>User Name</b></label>
+              <input id="username" class = "form-control" type="text" placeholder="Enter User Name: " name="username" required>
+              <label for="psw"><b>Password</b></label>
+              <input id="psw" class = "form-control" type="password"  placeholder="Enter Password: " name="psw" required> 
             </div>
+            {% if message %}
+              <div class="alert alert-warning"> 
+                {{ message }}
+              </div>
+            {% endif %}
+            <button class="btn btn-primary" type="submit">Login</button>
         </div>
-        </address>
-    </div>
+    </form>
 
     <!-- Footer -->
     <nav class="navbar fixed-bottom navbar-light bg-light">

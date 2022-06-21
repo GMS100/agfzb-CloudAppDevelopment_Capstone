@@ -20,7 +20,7 @@
                 <a class="navbar-brand" href="{% url 'djangoapp:index' %}">Dealership Review</a>
             </div>
             <div class='nav navbar-nav navbar-right'>
-                <a class='btn btn-link' href='about'>About Us</a> 
+                <a class='btn btn-link' href="{% url 'djangoapp:about' %}">About Us</a> 
             </div>
             <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
@@ -41,10 +41,10 @@
                     </form>
                 </li>
                 {% endif %}
-            </ul>
-        </div>        
+            </ul>            
+        </div>
     </nav>
-
+    
     <!-- Page Content -->
     <div class="container text-lg-center">
         Welcome to Best Cars dealership, home to the best cars in North America. We sell domestic and imported cars at reasonable prices.
@@ -53,7 +53,7 @@
     <!-- Footer -->
     <nav class="navbar fixed-bottom navbar-light bg-light">
         <div class="container-fluid">
-            <a class='btn btn-link' href='contact'>Contact Us</a> 
+            <a class='btn btn-link' href="{% url 'djangoapp:contact' %}">Contact Us</a> 
         </div>
     </nav>
 </body>
