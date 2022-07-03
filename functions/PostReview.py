@@ -18,7 +18,7 @@ def main(dict):
     IAM_API_KEY = dict['IAM_API_KEY']
     COUCH_USERNAME = dict['COUCH_USERNAME']
 
-    dbname = "reviews"
+    DB_NAME = "reviews"
 
     try:
         authenticator = IAMAuthenticator(IAM_API_KEY)
@@ -29,27 +29,33 @@ def main(dict):
         print("connection error")
         return {"error": err}
 
-
     try:
-        print("Code to post a review will go here")
-        jsonReview = {"review": 
-            {
-            "id": 5000,
-            "name": "Fred Tester",
-            "dealership": 46,
-            "review": "Great service!",
-            "purchase": False,
-            "another": "field",
-            "purchase_date": "02/16/2021",
-            "car_make": "Audi",
-            "car_model": "Car",
-            "car_year": 2021
+        jsonReview ={
+            "id": dict["id"],
+            "name": dict["name"],
+            "dealership": dict["dealership"],
+            "review": dict["review"],
+            "purchase": dict["purchase"],
+            "another": dict["another"],
+            "purchase_date": dict["purchase_date"],
+            "car_make": dict["car_make"],
+            "car_model": dict["car_model"],
+            "car_year": dict["car_year"]
             }
-        }
+
+        result = client.post_document(db=DB_NAME, document=jsonReview).get_result()
+
+        print("result=",result["ok"])
+        if result["ok"]:
+            return {"headers":{"Content-Type":"application/json"},"body":{"result":result}}
+        else:
+            return {"statusCode":500,"message":"Post unsuccessful","body":{"result":result}}
         
     except (ValueError) as err:
-        print("Value Error: " + err)
-        return {"error": "Error 100: Value Error"}
-
-#What do i want to return for a post...
-    return jsonReview
+        print("Value Error: 500")
+        return {"statusCode":500,"message":"ValueError"}
+#    except as err:
+#        print("Unknown Error: 500", sys.exc_info()[0])
+#        raise
+        
+        
