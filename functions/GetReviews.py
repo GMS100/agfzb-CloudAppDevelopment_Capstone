@@ -18,39 +18,33 @@ def main(dict):
     IAM_API_KEY = dict['IAM_API_KEY']
     COUCH_USERNAME = dict['COUCH_USERNAME']
 
-    dbname = "reviews"
-    dealershipID = dict["dealerId"]
+    DB_NAME = "reviews"
     
     try:
+        dealershipID = int(dict["dealerId"])
+    
         authenticator = IAMAuthenticator(IAM_API_KEY)
         client = CloudantV1(authenticator = authenticator)
         client.set_service_url(COUCH_URL)
         
-    except (requests.exceptions.RequestException, ConnectionResetError) as err:
-        print("connection error")
-        return {"error": err}
+        dealershipReviews = client.post_find(db=DB_NAME,selector={'dealership':dealershipID},
+             execution_stats=True).get_result()
 
-
-    try:
-        print("about to query db for dealer " + str(dealershipID))
-        dealershipReviews = client.post_find(db=dbname,selector={'dealership':dealershipID},execution_stats=True).get_result()
-        print("after query")
-        #print(dealershipReviews)
-        #print("Length=" + str(dealershipReviews['execution_stats']['results_returned']))
         if (dealershipReviews['execution_stats']['results_returned'] == 0):
-            print("going to throw 404 error")
-            return {"error": "Error 404: Dealer Id does not exist"}
+            print("No results returned: 404")
+            return {"statusCode":404,"message":"No reviews for dealer #" + str(dealershipID)}
     
-    except (ValueError) as err:
-        print("Value Error: " + err)
-        return {"error": "100 Value Error"}
-    
+    except (requests.exceptions.RequestException, ConnectionResetError) as err:
+        print("DB connection error: 500")
+        return {"statusCode":500, "message":"DB connection error"}
 
+    except (ValueError) as err:
+        print("ValueError: 404")
+        return {"statusCode": 404, "message":"Invalid dealer ID: " + str(dict["dealerId"])} 
+
+    except (KeyError) as err:
+        print("KeyError: 404")
+        return {"statusCode": 404, "message":"Missing dealerId parameter"}
+    
     return {"reviews":dealershipReviews["docs"]}
-    
-    
-    
-    
-    
-    
     
