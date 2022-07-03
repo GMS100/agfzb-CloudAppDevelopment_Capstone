@@ -14,26 +14,23 @@ function main(params) {
     cloudant.setServiceUrl(params.COUCH_URL);
 
     dbname = "dealerships";
-
-    if (typeof params.state !== "undefined") {
+    status = 200;
+    
+//    if (typeof params.state !== "undefined") {
         // Return all dealers in selected state
         /*****
         * Might want to add code so state name AND abbreviation work. 
         * Right now it requires the abbreviation 
         */
-        console.log("Dealers in " + params.state);
+//        console.log("Dealers in " + params.state);
+        selector = {};
         selector = {"st":params.state};
 
-        let dealerByState = getMatchingRecords(cloudant, dbname, selector);
-        return dealerByState; 
-    } else {
-        console.log("All Dealers");
+        let resultDealer = getMatchingRecords(cloudant, dbname, selector);
         
-        selector = {};
-        let allDealers = getMatchingRecords(cloudant, dbname, selector);
-        
-        return allDealers;
-    }
+        return resultDealer; 
+
+//        return {"statusCode":status,"headers":{"Content-Type":"application/json"}, "result":dealerByState.result}; 
 }
 
  /*
@@ -45,6 +42,7 @@ function main(params) {
          cloudant.postFind({db:dbname,selector:selector})
                  .then((result)=>{
                    resolve({result:result.result.docs});
+//                   resolve({result:result.result});
                  })
                  .catch(err => {
                     console.log(err);
@@ -53,32 +51,3 @@ function main(params) {
           })
  }
  
-function getDbs(cloudant) {
-     return new Promise((resolve, reject) => {
-         cloudant.getAllDbs()
-             .then(body => {
-                 resolve({ dbs: body.result });
-             })
-             .catch(err => {
-                  console.log(err);
-                 reject({ err: err });
-             });
-     });
- }
- 
-                        
- /*
- Sample implementation to get all the records in a db.
- */
- function getAllRecords(cloudant,dbname) {
-     return new Promise((resolve, reject) => {
-         cloudant.postAllDocs({ db: dbname, includeDocs: true, limit: 10 })            
-             .then((result)=>{
-               resolve({result:result.result.rows});
-             })
-             .catch(err => {
-                console.log(err);
-                reject({ err: err });
-             });
-         })
- }
