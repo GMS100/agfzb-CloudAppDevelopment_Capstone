@@ -33,6 +33,12 @@ def main(dict):
         if (dealershipReviews['execution_stats']['results_returned'] == 0):
             print("No results returned: 404")
             return {"statusCode":404,"message":"No reviews for dealer #" + str(dealershipID)}
+
+        return {"headers":{"Content-Type":"application/json"},
+             "body":{"data":dealershipReviews["docs"]}
+             }
+
+#        return {"reviews":dealershipReviews["docs"]}
     
     except (requests.exceptions.RequestException, ConnectionResetError) as err:
         print("DB connection error: 500")
@@ -45,6 +51,4 @@ def main(dict):
     except (KeyError) as err:
         print("KeyError: 404")
         return {"statusCode": 404, "message":"Missing dealerId parameter"}
-    
-    return {"reviews":dealershipReviews["docs"]}
     
