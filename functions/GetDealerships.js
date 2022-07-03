@@ -5,7 +5,7 @@
 const { CloudantV1 } = require('@ibm-cloud/cloudant');
 const { IamAuthenticator } = require('ibm-cloud-sdk-core');
 
-function main(params) {
+async function main(params) {
 
     const authenticator = new IamAuthenticator({ apikey: params.IAM_API_KEY })
     const cloudant = CloudantV1.newInstance({
@@ -16,21 +16,25 @@ function main(params) {
     dbname = "dealerships";
     status = 200;
     
-//    if (typeof params.state !== "undefined") {
-        // Return all dealers in selected state
-        /*****
-        * Might want to add code so state name AND abbreviation work. 
-        * Right now it requires the abbreviation 
-        */
-//        console.log("Dealers in " + params.state);
-        selector = {};
-        selector = {"st":params.state};
+    selector = {};
+    selector = {"st":params.state};
 
-        let resultDealer = getMatchingRecords(cloudant, dbname, selector);
+    try {
+        let resultDealers = await getMatchingRecords(cloudant, dbname, selector);
         
-        return resultDealer; 
-
-//        return {"statusCode":status,"headers":{"Content-Type":"application/json"}, "result":dealerByState.result}; 
+        console.log("# of results: " + Object.values(resultDealers.result).length);
+        if (Object.values(resultDealers.result).length == 0) {
+            status=404;
+        }
+        
+        return {"statusCode":status,"headers":{"Content-Type":"application/json"}, 
+            "result":resultDealers.result};         
+    } catch (error) {
+        console.log("Caught error");
+        status = 404;
+        return { statusCode:status,error:error.description };
+    }
+   
 }
 
  /*
@@ -42,7 +46,6 @@ function main(params) {
          cloudant.postFind({db:dbname,selector:selector})
                  .then((result)=>{
                    resolve({result:result.result.docs});
-//                   resolve({result:result.result});
                  })
                  .catch(err => {
                     console.log(err);
