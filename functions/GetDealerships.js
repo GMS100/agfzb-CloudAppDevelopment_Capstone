@@ -15,26 +15,37 @@ async function main(params) {
 
     dbname = "dealerships";
     status = 200;
-    
     selector = {};
-    selector = {"st":params.state};
 
-    try {
+/*    try {  */
+        if (params.state != undefined && params.state.length == 2) {
+            console.log("Have state abbreviation parameter");
+            selector = {"st":params.state.toUpperCase()};
+        } else if (params.state !== undefined) {
+            console.log("Have state name parameter");
+            //this only works if the name starts with capital and then lowercase
+            selector = {"state":params.state};
+        } else if (params.dealerId != undefined) {
+            console.log("Have ID parameter");
+            selector = {"id":parseInt(params.dealerId)};
+        }
+        
+//        console.log("Selector= " + JSON.stringify(selector));
         let resultDealers = await getMatchingRecords(cloudant, dbname, selector);
         
         console.log("# of results: " + Object.values(resultDealers.result).length);
         if (Object.values(resultDealers.result).length == 0) {
-            status=404;
+            status = 404
+            return { "statusCode":status, "message":"No results returned"};
         }
         
         return {"statusCode":status,"headers":{"Content-Type":"application/json"}, 
             "result":resultDealers.result};         
-    } catch (error) {
-        console.log("Caught error");
+/*    } catch (err) {
+        console.error(err);
         status = 404;
-        return { statusCode:status,error:error.description };
-    }
-   
+        return { "statusCode":status,"error":err}; 
+    } */
 }
 
  /*
@@ -44,6 +55,7 @@ async function main(params) {
  function getMatchingRecords(cloudant,dbname, selector) {
      return new Promise((resolve, reject) => {
          cloudant.postFind({db:dbname,selector:selector})
+//         cloudant.postFind({db:dbname,selector:selector,limit:5})
                  .then((result)=>{
                    resolve({result:result.result.docs});
                  })
