@@ -1,7 +1,7 @@
 import requests
 import json
 # import related models here
-from .models import CarDealer
+from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
 
 
@@ -81,8 +81,10 @@ def dealer_json_to_objects(json_result):
 def get_dealer_reviews_from_cf(url, dealerId):
     results = []
     # Call get_request with a URL parameter
+    print("dealerId to get_request:", dealerId)
     json_result = get_request(url, dealerId=dealerId)
     if json_result:
+        print("dealer_reviews JSON=", json_result)
         # Get the result list in JSON as reviews
         reviews = json_result["result"]
         # For each review object
@@ -90,10 +92,19 @@ def get_dealer_reviews_from_cf(url, dealerId):
             # Get its content in `doc` object
             review_doc = review
             # Create a DealerReview object with values in `doc` object
-            review_obj = DealerReview(dealership=review_doc["dealership"], name=review_doc["name"], purchase=review_doc["purchase"],
-                               review=review_doc["review"], purchase_date=review_doc["purchase_date"], car_make=review_doc["car_make"],
-                               car_model=review_doc["car_model"], car_year=review_doc["car_year"], sentiment=review_doc["sentiment"],
-                               review_id=review_doc["id"])
+            review_obj = DealerReview(dealership=review_doc["dealership"], name=review_doc["name"], 
+                       purchase=review_doc["purchase"],review=review_doc["review"])
+            if "purchase_date" in review:
+                review_obj.purchase_date=review_doc["purchase_date"]
+            if "car_make" in review:
+                review_obj.car_make = review_doc["car_make"]
+            if "car_model" in review:
+                review_obj.car_model = review_doc["car_model"]
+            if "car_year" in review:
+                review_obj.car_year = review_doc["car_year"]
+            if "id":
+                review_obj.review_id = review_doc["id"]        
+
             results.append(review_obj)
     return results
 
