@@ -99,39 +99,50 @@ def registration_request(request):
             return render(request, 'djangoapp/registration.html', context)
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
-def get_dealerships(request):
+def get_dealerships_by_state(request, state):
     if request.method == "GET":
-        print("In get_dealerships")
         # url = "your-cloud-function-domain/dealerships/dealer-get"
         url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
-        state = request.GET.get('state', False)
-        if state:
-            # Get dealers by state
-            dealerships = get_dealers_by_state(url, state)
-        else:
-            # Get dealers from the URL
-            dealerships = get_dealers_from_cf(url)
+        # Get dealers by state
+        dealerships = get_dealers_by_state(url, state)
 
         # Concat all dealer's short name
         dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
         # Return a list of dealer short name
         return HttpResponse(dealer_names)
 
+# Update the `get_dealerships` view to render the index page with a list of dealerships
+def get_dealerships(request):
+    if request.method == "GET":
+        # url = "your-cloud-function-domain/dealerships/dealer-get"
+        url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
+#        state = request.GET.get('state', False)
+#        if state:
+            # Get dealers by state
+#            dealerships = get_dealers_by_state(url, state)
+#        else:
+            # Get dealers from the URL
+        dealerships = get_dealers_from_cf(url)
+
+        # Concat all dealer's short name
+        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
+        # Return a list of dealer short name
+        return HttpResponse(dealer_names)
+
+
 # Create a `get_dealer_details` view to render the reviews of a dealer
 # def get_dealer_details(request, dealer_id):
 # ...
 #def get_dealer_details(request, dealer_id):
 def get_dealer_details(request, dealerId):
-    print("in get_dealer_details")
     if request.method == "GET":
-        #dealer_id = request.GET.get('dealerId')
         #url = "your-cloud-function-domain/review/review-get"
         url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/review/review-get"
 #        url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/review-get"
         # Get dealers from the URL
         reviews = get_dealer_reviews_from_cf(url, dealerId)
         # Concat all dealer's short name
-        review_list = ' '.join([review.review for review in reviews])
+        review_list = ' '.join([("Review: " + review.review + " Sentiment: " + review.sentiment) for review in reviews])
         # Return a list of reviews
         return HttpResponse(review_list)
 
