@@ -19,10 +19,11 @@ def main(dict):
     COUCH_USERNAME = dict['COUCH_USERNAME']
 
     DB_NAME = "reviews"
+    status=200
     
     try:
         dealershipID = int(dict["dealerId"])
-    
+
         authenticator = IAMAuthenticator(IAM_API_KEY)
         client = CloudantV1(authenticator = authenticator)
         client.set_service_url(COUCH_URL)
@@ -34,12 +35,9 @@ def main(dict):
             print("No results returned: 404")
             return {"statusCode":404,"message":"No reviews for dealer #" + str(dealershipID)}
 
-        return {"headers":{"Content-Type":"application/json"},
-             "body":{"data":dealershipReviews["docs"]}
-             }
+        return {"statusCode":status,"headers":{"Content-Type":"application/json"}, 
+            "result":dealershipReviews["docs"]};         
 
-#        return {"reviews":dealershipReviews["docs"]}
-    
     except (requests.exceptions.RequestException, ConnectionResetError) as err:
         print("DB connection error: 500")
         return {"statusCode":500, "message":"DB connection error"}
