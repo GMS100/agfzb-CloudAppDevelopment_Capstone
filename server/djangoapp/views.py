@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 #from .models import related models
-from .restapis import get_dealers_from_cf, get_dealers_by_state, get_dealer_reviews_from_cf
+from .restapis import get_dealers_from_cf, get_dealers_by_state, get_dealer_reviews_from_cf, post_request
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -149,4 +149,36 @@ def get_dealer_details(request, dealerId):
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
+def add_review(request, dealer_id):
+    print("in add_review")
+    if request.method == 'POST':
+        url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
+        # Get user information from request.POST
+        print("in add_review POST")
+        if request.user.is_authenticated:
+            print("in True if")
+#            username = request.user.username
+            username = "TestUser1"
+            # Create review object
+            review["dealership"] = 46
+            review["name"] = username
+#            if "purchasecheck" in request.POST:
+#                if request.POST["purchasecheck"] == 'on':
+#                    review["purchase"] = True
+            review["purchase"] = "false"
+            review["review"] = "This is an awful dealer. Don't go there."
+            review["purchase_date"] = datetime.utcnow().isoformat()
+            review["car_make"] = "Honda"
+            review["car_model"] = "Civic"
+            review["car_year"] = 2022
+            review["sentiment"] = "Neutral"
+            review["review_id"] = 5500
 
+            json_payload["review"] = review
+            response = post_request(url, json_payload, dealerId=dealer_id)
+        else: 
+            response =  [{"statusCode":"404"},{"message":"User not logged in"}]
+    else:
+        response = [{"statusCode":"404"},{"message":"Not a POST request"}]
+
+    return HttpResponse(response)
