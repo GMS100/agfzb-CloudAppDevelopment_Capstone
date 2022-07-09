@@ -114,37 +114,42 @@ def get_dealerships_by_state(request, state):
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     if request.method == "GET":
+        # Context will contain the dealership objects
+        context = {}
+
         # url = "your-cloud-function-domain/dealerships/dealer-get"
         url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
-#        state = request.GET.get('state', False)
-#        if state:
-            # Get dealers by state
-#            dealerships = get_dealers_by_state(url, state)
-#        else:
-            # Get dealers from the URL
+        
+        # Get dealers from the URL and add to context
         dealerships = get_dealers_from_cf(url)
+        context["dealership_list"] = dealerships
 
-        # Concat all dealer's short name
-        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
-        # Return a list of dealer short name
-        return HttpResponse(dealer_names)
-
+        # Concat all dealer's short name *** stub code for testing
+        #dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
+        #return HttpResponse(dealer_names)
+        
+        return render(request, 'djangoapp/index.html', context)
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
 # def get_dealer_details(request, dealer_id):
 # ...
-#def get_dealer_details(request, dealer_id):
 def get_dealer_details(request, dealerId):
     if request.method == "GET":
+        # Context will contain dealer and review objects
+        context = {}
         #url = "your-cloud-function-domain/review/review-get"
         url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/review/review-get"
 #        url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/review-get"
         # Get dealers from the URL
         reviews = get_dealer_reviews_from_cf(url, dealerId)
-        # Concat all dealer's short name
-        review_list = ' '.join([("Review: " + review.review + " Sentiment: " + review.sentiment) for review in reviews])
+        context["results"] = reviews
+        
+        # Concat all dealer's short name  ** Stub code for testing
+        #review_list = ' '.join([("Review: " + review.review + " Sentiment: " + review.sentiment) for review in reviews])
         # Return a list of reviews
-        return HttpResponse(review_list)
+        
+        # Return the dealer detail page info
+        return render(request, 'djangoapp/dealer_details.html', context)
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
