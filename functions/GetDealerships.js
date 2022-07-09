@@ -25,18 +25,20 @@ async function main(params) {
             console.log("Have state name parameter");
             //this only works if the name starts with capital and then lowercase
             selector = {"state":params.state};
-        } else if (params.dealerId != undefined) {
+//        } else if (params.dealerId != undefined) {
+        } else if (params.id != undefined) {
             console.log("Have ID parameter");
-            selector = {"id":parseInt(params.dealerId)};
+//            selector = {"id":parseInt(params.dealerId)};
+            selector = {"id":params.id};
         }
         
 //        console.log("Selector= " + JSON.stringify(selector));
         let resultDealers = await getMatchingRecords(cloudant, dbname, selector);
         
         console.log("# of results: " + Object.values(resultDealers.result).length);
-        if (Object.values(resultDealers.result).length == 0) {
-            status = 404
-            return { "statusCode":status, "message":"No results returned"};
+//        if (Object.values(resultDealers.result).length == 0) {
+//            status = 404
+//            return { "statusCode":status, "message":"No results returned"};
         }
         
         return {"statusCode":status,"headers":{"Content-Type":"application/json"}, 

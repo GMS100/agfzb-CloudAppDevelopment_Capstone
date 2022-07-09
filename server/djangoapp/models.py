@@ -46,7 +46,7 @@ class CarModel(models.Model):
     bodyType = models.CharField(max_length=2, choices=BODY_TYPE_CHOICES)
 
     def __str__(self):
-        return (self.year.strftime('%Y') + " " + self.make.name + " " + self.name)
+        return (self.make.name + " " + self.name + " " + self.year.strftime('%Y'))
 
 # A plain Python class `CarDealer` to hold dealer data
 class CarDealer:

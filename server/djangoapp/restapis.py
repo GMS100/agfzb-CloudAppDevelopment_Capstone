@@ -87,7 +87,8 @@ def get_dealers_by_state(url, state):
 def get_dealers_by_id(url, id):
     results = []
     # Call get_request with a URL parameter
-    json_result = get_request(url, id = id)
+    print("**** in get_dealers_by_id id is type:", type(id))
+    json_result = get_request(url, id=id)
     if json_result:
         results = dealer_json_to_objects(json_result)
     return results
@@ -97,6 +98,7 @@ def get_dealers_by_id(url, id):
 # - Requires a json object with data for one or more dealers
 # - Returns a list of CarDealer object(s)
 def dealer_json_to_objects(json_result):
+    print("*****dealer_json_to_objects arg:",json_result)
     results = []
     # Get the row list in JSON as dealers
 #   dealers = json_result["rows"]
@@ -122,9 +124,8 @@ def dealer_json_to_objects(json_result):
 def get_dealer_reviews_from_cf(url, id):
     results = []
     # Call get_request with a URL parameter
-    json_result = get_request(url, id=id)
-#    if (json_result['statusCode'] == 200):
-    print("**** json_result=", json_result)
+    json_result = get_request(url, dealerId=id)
+
     if json_result and (json_result['statusCode'] == 200):
         # Get the result list in JSON as reviews
         reviews = json_result["result"]

@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 
-    <body>
-
-    <!--Add a nav bar here -->
+<body>
     <!-- Nav bar -->
     <nav class="navbar navbar-light bg-light">
         <div class="container-fluid">
@@ -24,7 +22,6 @@
                 <li>
                     <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
                     <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
-                    <a class="btn_btn-link" href="{% url 'djangoapp:add_review' dealer.id%}">Add Review</a>
                 </li>
                 {% else %}
                 <li>
@@ -43,6 +40,8 @@
         </div>
     </nav>
 
+    <div class="container">
+    {% if reviews %}
     <!-- Add reviews as cards -->
     <div class="card-columns">
         {% for review in reviews %}
@@ -63,10 +62,13 @@
                 <h5 class="card-title">{{review.car_year}}</h5>
                 {% endif %}
                 <p class="card-text">{{review.review}}</p>
-
             </div>
         </div>
         {% endfor %}
+    </div>
+    {% else %}
+        <text>No reviews for this dealer</text>
+    {% endif %}
     </div>
 
     <!-- Footer -->
@@ -76,6 +78,6 @@
         </div>
     </nav>
 
-    </body>
+</body>
 
 </html>

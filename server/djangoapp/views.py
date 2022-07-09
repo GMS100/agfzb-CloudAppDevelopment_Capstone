@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
-#from .models import related models
+from .models import CarModel
 from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, post_request
 from .restapis import get_dealers_by_state, get_dealers_by_id
 from django.contrib.auth import login, logout, authenticate
@@ -147,15 +147,16 @@ def get_dealer_details(request, id):
     if request.method == "GET":
         # Context will contain dealer and review objects
         context = {}
-        url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/review-get"
+        dealer_url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/review-get"
 
         # Get dealer object and add to context
-        dealer = get_dealers_by_id(url, id=id)
+        print("**** in get_dealer_details id is type:",type(id))
+        dealer = get_dealers_by_id(dealer_url, id=id)
         context["dealer"] = dealer
 
         #get review objects and add to context
-        url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/review/review-get"
-        reviews = get_dealer_reviews_from_cf(url, id=id)
+        review_url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/review/review-get"
+        reviews = get_dealer_reviews_from_cf(review_url, id=id)
         context["reviews"] = reviews
         
         # Return the dealer detail page info
@@ -165,11 +166,25 @@ def get_dealer_details(request, id):
 # def add_review(request, dealer_id):
 # ...
 def add_review(request, id):
-    print("in add_review")
-    if request.method == 'POST':
-        url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
-        # Get user information from request.POST
+    context = {}
+    dealer_url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
+
+    # Get dealer and add to context
+    print("**** in add_review id type is:", type(id))
+    dealer = get_dealers_by_id(dealer_url, id=id)
+    context["dealer"] = dealer
+
+    if request.method == 'GET':
+        # Get cars by dealer and add to context
+        print("in add_review GET")
+        cars = CarModel.objects.all()
+        print(cars)
+        context["cars"] = cars       
+
+        return render(request, 'djangoapp/add_review.html', context)
+    elif request.method == 'POST':
         print("in add_review POST")
+        # Get user information from request.POST
         if request.user.is_authenticated:
             print("in True if")
 #            username = request.user.username
@@ -177,9 +192,9 @@ def add_review(request, id):
             # Create review object
             review["dealership"] = 46
             review["name"] = username
-#            if "purchasecheck" in request.POST:
-#                if request.POST["purchasecheck"] == 'on':
-#                    review["purchase"] = True
+            if "purchasecheck" in request.POST:
+                if request.POST["purchasecheck"] == 'on':
+                    review["purchase"] = True
             review["purchase"] = "false"
             review["review"] = "This is an awful dealer. Don't go there."
             review["purchase_date"] = datetime.utcnow().isoformat()
@@ -192,8 +207,8 @@ def add_review(request, id):
             json_payload["review"] = review
             response = post_request(url, json_payload, id=id)
         else: 
-            response =  [{"statusCode":"404"},{"message":"User not logged in"}]
+            response =  [{"statusCode":"404"},{"message":"Please login to add a review"}]
     else:
-        response = [{"statusCode":"404"},{"message":"Not a POST request"}]
+        response = [{"statusCode":"404"},{"message":"Not a GET or POST request"}]
 
     return HttpResponse(response)
