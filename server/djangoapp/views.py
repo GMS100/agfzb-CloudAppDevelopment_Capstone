@@ -3,7 +3,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 #from .models import related models
-from .restapis import get_dealers_from_cf, get_dealers_by_state, get_dealer_reviews_from_cf, post_request
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, post_request
+from .restapis import get_dealers_by_state, get_dealers_by_id
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -101,23 +102,32 @@ def registration_request(request):
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships_by_state(request, state):
     if request.method == "GET":
-        # url = "your-cloud-function-domain/dealerships/dealer-get"
+        context = {}
         url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
-        # Get dealers by state
-        dealerships = get_dealers_by_state(url, state)
 
-        # Concat all dealer's short name
-        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
-        # Return a list of dealer short name
-        return HttpResponse(dealer_names)
+        # Get dealers by state and add to context
+        dealerships = get_dealers_by_state(url, state)
+        context["dealership_list"] = dealerships
+
+        return render(request, 'djangoapp/index.html', context)
+
+# Update the `get_dealerships` view to render the index page with a list of dealerships
+def get_dealership_by_id(request, id):
+    if request.method == "GET":
+        context = {}
+        url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
+
+        # Get dealers by id and add to context
+        dealerships = get_dealers_by_state(url, id)
+        context["dealership_list"] = dealerships
+
+        return render(request, 'djangoapp/index.html', context)
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     if request.method == "GET":
         # Context will contain the dealership objects
         context = {}
-
-        # url = "your-cloud-function-domain/dealerships/dealer-get"
         url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
         
         # Get dealers from the URL and add to context
@@ -133,20 +143,20 @@ def get_dealerships(request):
 # Create a `get_dealer_details` view to render the reviews of a dealer
 # def get_dealer_details(request, dealer_id):
 # ...
-def get_dealer_details(request, dealerId):
+def get_dealer_details(request, id):
     if request.method == "GET":
         # Context will contain dealer and review objects
         context = {}
-        #url = "your-cloud-function-domain/review/review-get"
+        url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/review-get"
+
+        # Get dealer object and add to context
+        dealer = get_dealers_by_id(url, id=id)
+        context["dealer"] = dealer
+
+        #get review objects and add to context
         url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/review/review-get"
-#        url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/review-get"
-        # Get dealers from the URL
-        reviews = get_dealer_reviews_from_cf(url, dealerId)
+        reviews = get_dealer_reviews_from_cf(url, id=id)
         context["reviews"] = reviews
-        
-        # Concat all dealer's short name  ** Stub code for testing
-        #review_list = ' '.join([("Review: " + review.review + " Sentiment: " + review.sentiment) for review in reviews])
-        # Return a list of reviews
         
         # Return the dealer detail page info
         return render(request, 'djangoapp/dealer_details.html', context)
@@ -154,7 +164,7 @@ def get_dealer_details(request, dealerId):
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
-def add_review(request, dealer_id):
+def add_review(request, id):
     print("in add_review")
     if request.method == 'POST':
         url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
@@ -180,7 +190,7 @@ def add_review(request, dealer_id):
             review["review_id"] = 5500
 
             json_payload["review"] = review
-            response = post_request(url, json_payload, dealerId=dealer_id)
+            response = post_request(url, json_payload, id=id)
         else: 
             response =  [{"statusCode":"404"},{"message":"User not logged in"}]
     else:

@@ -80,6 +80,18 @@ def get_dealers_by_state(url, state):
         results = dealer_json_to_objects(json_result)
     return results
 
+# Create a get_dealers_ method to get dealers from a cloud function
+# def get_dealers_by_id(url, **kwargs):
+# - Call get_request() with specified arguments
+# - Call dealer_json_to_objects() with JSON results
+def get_dealers_by_id(url, id):
+    results = []
+    # Call get_request with a URL parameter
+    json_result = get_request(url, id = id)
+    if json_result:
+        results = dealer_json_to_objects(json_result)
+    return results
+
 # Parse JSON results into a CarDealer object list
 # def dealer_json_to_objects(json_result):
 # - Requires a json object with data for one or more dealers
@@ -107,12 +119,13 @@ def dealer_json_to_objects(json_result):
 # - Call get_request() with specified arguments
 # - Parse JSON results into a DealerView object list
 #def get_dealer_reviews_from_cf(url, dealerId):
-def get_dealer_reviews_from_cf(url, dealerId):
+def get_dealer_reviews_from_cf(url, id):
     results = []
     # Call get_request with a URL parameter
-    json_result = get_request(url, dealerId=dealerId)
+    json_result = get_request(url, id=id)
 #    if (json_result['statusCode'] == 200):
-    if json_result:
+    print("**** json_result=", json_result)
+    if json_result and (json_result['statusCode'] == 200):
         # Get the result list in JSON as reviews
         reviews = json_result["result"]
         # For each review object
@@ -136,6 +149,8 @@ def get_dealer_reviews_from_cf(url, dealerId):
             review_obj.sentiment = analyze_review_sentiments(review_obj.review)
 
             results.append(review_obj)
+        return results
+    else:
         return results
 
 # Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
