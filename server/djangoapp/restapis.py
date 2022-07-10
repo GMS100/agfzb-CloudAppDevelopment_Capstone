@@ -31,7 +31,7 @@ def get_request(url, **kwargs):
                                     params=kwargs)
     except:
         # If any error occurs
-        print("Network exception occurred")
+        print("get_request: Network exception occurred")
     status_code = response.status_code
     print("get_request:", "With status {} ".format(status_code))
     json_data = json.loads(response.text)
@@ -40,20 +40,22 @@ def get_request(url, **kwargs):
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
 def post_request(url, json_payload, **kwargs):
-    print("GET from {} ".format(url))
-    print("*** In POST ***")
+    print("post_request: " + str(kwargs))
+    print("post_request: " + "GET from {} ".format(url))
     try:
-        response = requests.Response()
         # Call post method of requests library without auth
-        response = requests.post(url, headers={'Content-Type': 'application/json'},
-                                    json=json_payload, params=kwargs)
+#        response = requests.post(url, headers={'Content-Type': 'application/json'},
+#                                    json=json_payload, params=kwargs)
+        response = requests.post(url, params=kwargs, json=json_payload)
+        print("post_request: status_code=", response.status_code)
     except:
         # If any error occurs
-        print("Network exception occurred")
+        print("post_request: Network exception occurred")
     status_code = response.status_code
-    print("With status {} ".format(status_code))
+    print("post_request: With status {} ".format(status_code))
+    print("post_request: response=", response)
     json_data = json.loads(response.text)
-    print("json_data from POST: ", json_data)
+    print("post_request: json_data from POST: ", json_data)
     return json_data
 
 # Create a get_dealers_from_cf method to get dealers from a cloud function
