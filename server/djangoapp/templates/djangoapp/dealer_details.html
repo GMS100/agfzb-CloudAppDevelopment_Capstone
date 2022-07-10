@@ -22,6 +22,7 @@
                 <li>
                     <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
                     <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
+                    <a class="btn btn-link" href="{% url 'djangoapp:add_review' dealer.id%}">Add Review</a>
                 </li>
                 {% else %}
                 <li>
@@ -40,35 +41,36 @@
         </div>
     </nav>
 
-    <div class="container">
-    {% if reviews %}
-    <!-- Add reviews as cards -->
-    <div class="card-columns">
-        {% for review in reviews %}
-        <div class="card" bg-light>
-            {% if review.sentiment == "positive" %}
-            <img class="card-img-left" src="{{MEDIA_URL}}/emoji/positive.png"
-                width="36px" height="36px" alt="sentiment">
-            {% elif review.sentiment == "negative" %}
-            <img class="card-img-left" src="{{MEDIA_URL}}/emoji/negative.png" 
-                width="36px" height="36px" alt="sentiment">
-            {% elif review.sentiment == "neutral" %}
-            <img class="card-img-left" src="{{MEDIA_URL}}/emoji/neutral.png"
-                width="36px" height="36px" alt="sentiment">
-            {% endif %}
-            <div class="card-body">
-                {% if review.car_make %}
-                <h5 class="card-title">{{review.car_make}}, {{review.car_model}}</h5>
-                <h5 class="card-title">{{review.car_year}}</h5>
+    <div class="container-fluid">
+        <h3>Reviews for <b>{{dealer.full_name}}</b></h3>
+        {% if reviews %}
+        <!-- Add reviews as cards -->
+        <div class="card-columns">
+            {% for review in reviews %}
+            <div class="card" bg-light>
+                {% if review.sentiment == "positive" %}
+                <img class="card-img-left" src="{{MEDIA_URL}}/emoji/positive.png"
+                    width="36px" height="36px" alt="sentiment">
+                {% elif review.sentiment == "negative" %}
+                <img class="card-img-left" src="{{MEDIA_URL}}/emoji/negative.png" 
+                    width="36px" height="36px" alt="sentiment">
+                {% elif review.sentiment == "neutral" %}
+                <img class="card-img-left" src="{{MEDIA_URL}}/emoji/neutral.png"
+                    width="36px" height="36px" alt="sentiment">
                 {% endif %}
-                <p class="card-text">{{review.review}}</p>
+                <div class="card-body">
+                    {% if review.car_make %}
+                    <h5 class="card-title">{{review.car_make}}, {{review.car_model}}</h5>
+                    <h5 class="card-title">{{review.car_year}}</h5>
+                    {% endif %}
+                    <p class="card-text">{{review.review}}</p>
+                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    {% else %}
-        <text>No reviews for this dealer</text>
-    {% endif %}
+        {% else %}
+        <h4>No reviews for this dealer</h4>
+        {% endif %}
     </div>
 
     <!-- Footer -->

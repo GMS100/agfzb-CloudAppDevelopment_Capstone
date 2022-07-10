@@ -14,10 +14,6 @@ import json
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-
-# Create your views here.
-
-
 # Create an `about` view to render a static about page
 # def about(request):
 # ...
@@ -44,14 +40,12 @@ def login_request(request):
         if user is not None:
             # If user is valid, call login method to login current user
             login(request, user)
- # Change pages for redirects?
             return redirect('djangoapp:index')
         else:
             # If not, return to login page again
             context['message'] = "Invalid username or password."
             context['user'] = username
-            #return render(request, 'djangoapp/index.html', context)
-            print(str(context))
+            print("login_request: context=", context)
             return render(request, 'djangoapp/login.html', context)
     else:
         return render(request, 'djangoapp/index.html', context)
@@ -120,7 +114,6 @@ def get_dealership_by_id(request, id):
         # Get dealers by id and add to context
         dealerships = get_dealers_by_id(url, id)
         context["dealership_list"] = dealerships
-
         return render(request, 'djangoapp/index.html', context)
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
@@ -134,10 +127,6 @@ def get_dealerships(request):
         dealerships = get_dealers_from_cf(url)
         context["dealership_list"] = dealerships
 
-        # Concat all dealer's short name *** stub code for testing
-        #dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
-        #return HttpResponse(dealer_names)
-        
         return render(request, 'djangoapp/index.html', context)
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
@@ -174,18 +163,16 @@ def add_review(request, id):
 
     if request.method == 'GET':
         # Get cars by dealer and add to context
-        print("in add_review GET")
+        print("add_review: GET")
         cars = CarModel.objects.all()
-        print(cars)
         context["cars"] = cars       
-        print("Context:", context)
+        print("add_review: context=", context)
         return render(request, 'djangoapp/add_review.html', context)
     elif request.method == 'POST':
-        print("in add_review POST")
+        print("add_review: POST")
         # Get user information from request.POST
         if request.user.is_authenticated:
             print("in True if")
-#            username = request.user.username
             username = request.user.username
             # Create review object
             review = dict()

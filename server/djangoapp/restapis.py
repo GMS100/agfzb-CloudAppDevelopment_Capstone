@@ -11,8 +11,8 @@ from ibm_watson.natural_language_understanding_v1 import Features,SentimentOptio
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
 #                                     auth=HTTPBasicAuth('apikey', api_key))
 def get_request(url, **kwargs):
-    print(kwargs)
-    print("GET from {} ".format(url))
+    print("get_request: kwargs=", kwargs)
+    print("get request: url=", "GET from {} ".format(url))
     try:
         response = requests.Response()
         api_key = kwargs.get('apikey', False)
@@ -33,7 +33,7 @@ def get_request(url, **kwargs):
         # If any error occurs
         print("Network exception occurred")
     status_code = response.status_code
-    print("With status {} ".format(status_code))
+    print("get_request:", "With status {} ".format(status_code))
     json_data = json.loads(response.text)
     return json_data
 
@@ -72,9 +72,7 @@ def get_dealers_from_cf(url, **kwargs):
 # - Call get_request() with specified arguments
 # - Call dealer_json_to_objects() with JSON results
 def get_dealers_by_state(url, state):
-    results = []
-#    kstate = kwargs["state"]
-    # Call get_request with a URL parameter
+     # Call get_request with a URL parameter
     json_result = get_request(url, state = state)
     if json_result:
         results = dealer_json_to_objects(json_result)
@@ -85,38 +83,39 @@ def get_dealers_by_state(url, state):
 # - Call get_request() with specified arguments
 # - Call dealer_json_to_objects() with JSON results
 def get_dealers_by_id(url, id):
+    # Returns a dealer object, not a list of dealers
     results = []
     # Call get_request with a URL parameter
-    print("**** in get_dealers_by_id id is type:", type(id))
     json_result = get_request(url, id=id)
     if json_result:
-        results = dealer_json_to_objects(json_result)
-    return results
+        dealers = json_result["result"]
+        # For each dealer object
+        for dealer in dealers:
+            # Get its content in `doc` object
+            dealer_doc = dealer
+            # Create a CarDealer object with values in `doc` object
+            dealer_obj = CarDealer(address=dealer_doc["address"], city=dealer_doc["city"], full_name=dealer_doc["full_name"],
+                               id=dealer_doc["id"], lat=dealer_doc["lat"], long=dealer_doc["long"],
+                               short_name=dealer_doc["short_name"], st=dealer_doc["st"], zip=dealer_doc["zip"])
+    return dealer_obj
 
 # Parse JSON results into a CarDealer object list
 # def dealer_json_to_objects(json_result):
 # - Requires a json object with data for one or more dealers
 # - Returns a list of CarDealer object(s)
 def dealer_json_to_objects(json_result):
-    print("*****dealer_json_to_objects arg:",json_result)
+    # Returns a list of dealer objects
     results = []
     # Get the row list in JSON as dealers
-#   dealers = json_result["rows"]
     dealers = json_result["result"]
     # For each dealer object
     for dealer in dealers:
-        print("dealer_json_to_objects dealer:", dealer)
-        # Get its content in `doc` object
-#        dealer_doc = dealer["doc"]
         dealer_doc = dealer
         # Create a CarDealer object with values in `doc` object
         dealer_obj = CarDealer(address=dealer_doc["address"], city=dealer_doc["city"], full_name=dealer_doc["full_name"],
                                id=dealer_doc["id"], lat=dealer_doc["lat"], long=dealer_doc["long"],
                                short_name=dealer_doc["short_name"], st=dealer_doc["st"], zip=dealer_doc["zip"])
-        print("dealer_json_to_objects dealer_obj:", dealer_obj)
-
         results.append(dealer_obj)
-
     return results
 
 # get_dealer_reviews_from_cf method to get reviews by dealer id from a cloud function
@@ -162,7 +161,6 @@ def get_dealer_reviews_from_cf(url, id):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
 def analyze_review_sentiments(dealer_review):
-    #print(dealer_review)
     url = "https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/b38d3838-1a6c-4e92-a7ca-72ba83a4b62e"
     api_key = "pN4oOSB2WX9jkwgEuhVNdlCY2kJysoAoNKmI6n-1Vsah" 
     authenticator = IAMAuthenticator(api_key) 
