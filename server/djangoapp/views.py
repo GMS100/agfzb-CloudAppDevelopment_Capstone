@@ -118,7 +118,7 @@ def get_dealership_by_id(request, id):
         url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
 
         # Get dealers by id and add to context
-        dealerships = get_dealers_by_state(url, id)
+        dealerships = get_dealers_by_id(url, id)
         context["dealership_list"] = dealerships
 
         return render(request, 'djangoapp/index.html', context)
@@ -170,7 +170,6 @@ def add_review(request, id):
     dealer_url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
 
     # Get dealer and add to context
-    print("**** in add_review id type is:", type(id))
     dealer = get_dealers_by_id(dealer_url, id=id)
     context["dealer"] = dealer
 
@@ -180,7 +179,7 @@ def add_review(request, id):
         cars = CarModel.objects.all()
         print(cars)
         context["cars"] = cars       
-
+        print("Context:", context)
         return render(request, 'djangoapp/add_review.html', context)
     elif request.method == 'POST':
         print("in add_review POST")
@@ -188,24 +187,31 @@ def add_review(request, id):
         if request.user.is_authenticated:
             print("in True if")
 #            username = request.user.username
-            username = "TestUser1"
+            username = request.user.username
             # Create review object
-            review["dealership"] = 46
+            review = dict()
+            car_id = request.POST["car"]
+            car = CarModel.objects.get(pk=car_id)
+            review["dealership"] = id
             review["name"] = username
             if "purchasecheck" in request.POST:
                 if request.POST["purchasecheck"] == 'on':
                     review["purchase"] = True
-            review["purchase"] = "false"
             review["review"] = "This is an awful dealer. Don't go there."
-            review["purchase_date"] = datetime.utcnow().isoformat()
-            review["car_make"] = "Honda"
-            review["car_model"] = "Civic"
-            review["car_year"] = 2022
-            review["sentiment"] = "Neutral"
-            review["review_id"] = 5500
+            #review["purchase_date"] = datetime.utcnow().isoformat()
+            review["purchase_date"] = request.POST["purchasedate"]
+            review["car_make"] = car.make.name
+            review["car_model"] = car.name
+            review["car_year"] = int(car.year.strftime("%Y"))
+            review["review_id"] = datetime.utcnow().isoformat()
+            #review["review_id"] = 5500
 
+            json_payload = {}
             json_payload["review"] = review
+            
+            review_url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/review"
             response = post_request(url, json_payload, id=id)
+            return redirect("djangoapp:dealer_details", id=id)
         else: 
             response =  [{"statusCode":"404"},{"message":"Please login to add a review"}]
     else:

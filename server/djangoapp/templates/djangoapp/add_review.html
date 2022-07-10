@@ -44,7 +44,14 @@
     </nav>
     
     <!--Add review form here -->
-    <h3>Add a review about {{dealer.full_name}}</h3>
+    {% if dealer %}
+    <h3>Add a review about {{dealer_full_name}}</h3>
+    <h2>Dealers:{{dealer}}</h2>
+    <h2>Dealer id:{{dealer.id}}</h2>
+    {% endif %}
+    {% for dealer in dealers %}
+    <h2>In for dealer full name:{{dealer_full_name}}</h2>
+    <h2>In for dealer try name:{{dealer.full_name}}</h2>
     <form action="{% url 'djangoapp:add_review' dealer.id %}" method="post">
         <div class="form-group">
             <label for="content">Enter the review content:</label>
@@ -69,6 +76,7 @@
             <input class="date-own form control" type="text" name="purchasedate" id="purchasedate">
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
+        {% endfor %}
     </form> 
     <script type="text/javascript">
         $('.date-own').datepicker({format: 'mm/dd/yyyy'});
