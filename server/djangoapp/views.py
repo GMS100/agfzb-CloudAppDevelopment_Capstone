@@ -147,10 +147,9 @@ def get_dealer_details(request, id):
     if request.method == "GET":
         # Context will contain dealer and review objects
         context = {}
-        dealer_url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/review-get"
+        dealer_url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
 
         # Get dealer object and add to context
-        print("**** in get_dealer_details id is type:",type(id))
         dealer = get_dealers_by_id(dealer_url, id=id)
         context["dealer"] = dealer
 
