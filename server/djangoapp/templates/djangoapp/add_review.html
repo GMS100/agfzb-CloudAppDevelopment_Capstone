@@ -5,10 +5,12 @@
     {% load static %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css" rel="stylesheet">
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+    <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel = "stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.4/jquery.js"></script>
+    <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
-
 </head>
 <body>
     <!-- Nav bar -->
@@ -71,7 +73,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="purchasedate"><b>Select Your Purchase Date:</b></label>
-                    <input class="date-own form control" type="text" name="purchasedate" id="purchasedate">
+                    <input class="date-own form-control" type="text" style="width: 300px;" name="purchasedate" id="purchasedate">  
                 </div>
                 <div>
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -82,12 +84,12 @@
                     <div class="alert alert-warning" role="alert">{{ message }}</div>
                 {% endfor %}
             {% endif %}
+            <script type="text/javascript">
+                $('.date-own').datepicker({format: 'mm/dd/yyyy'});
+            </script>
         </form> 
     {% endif %}
     </div>
-    <script type="text/javascript">
-        $('.date-own').datepicker({format: 'mm/dd/yyyy'});
-    </script>
     <!-- Footer -->
     <nav class="navbar fixed-bottom navbar-light bg-light">
         <div class="container-fluid">

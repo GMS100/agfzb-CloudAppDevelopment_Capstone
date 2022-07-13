@@ -11,8 +11,7 @@ from ibm_watson.natural_language_understanding_v1 import Features,SentimentOptio
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
 #                                     auth=HTTPBasicAuth('apikey', api_key))
 def get_request(url, **kwargs):
-    print("get_request: kwargs=", kwargs)
-    print("get request: url=", "GET from {} ".format(url))
+    #print("get request: url=", "GET from {} ".format(url))
     try:
         response = requests.Response()
         api_key = kwargs.get('apikey', False)
@@ -33,15 +32,14 @@ def get_request(url, **kwargs):
         # If any error occurs
         print("get_request: Network exception occurred")
     status_code = response.status_code
-    print("get_request:", "With status {} ".format(status_code))
+    #print("get_request:", "With status {} ".format(status_code))
     json_data = json.loads(response.text)
     return json_data
 
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
 def post_request(url, json_payload, **kwargs):
-    print("post_request: " + str(kwargs))
-    print("post_request: " + "GET from {} ".format(url))
+    #print("post_request: " + "GET from {} ".format(url)) 
     try:
         # Call post method of requests library without auth
         response = requests.post(url, params=kwargs, json=json_payload)
@@ -49,7 +47,7 @@ def post_request(url, json_payload, **kwargs):
         # If any error occurs
         print("post_request: Network exception occurred")
     status_code = response.status_code
-    print("post_request: With status {} ".format(status_code))
+    #print("post_request: With status {} ".format(status_code))
     json_data = json.loads(response.text)
     return json_data
 

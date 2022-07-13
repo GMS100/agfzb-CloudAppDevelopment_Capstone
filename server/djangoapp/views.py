@@ -219,8 +219,8 @@ def get_dealers_models(request):
         url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
         
         # Get dealers from the URL and add to context
-#        dealerships = get_dealers_from_cf(url)
-        dealerships = get_dealers_by_state(url, "TX")
+        dealerships = get_dealers_from_cf(url)
+#        dealerships = get_dealers_by_state(url, "TX")
 
         # Go through dealer objects and add model list
         for dealer in dealerships:
@@ -228,15 +228,6 @@ def get_dealers_models(request):
             
             for car in cars:
                 dealer.models.append(car)
-#            print("cars is of type ", type(list(cars)))
-#            print("cars:", cars)
-#            dealer.models.append(list(cars))
-#            print("dealer is of type ", type(dealer))
-#            print("dealer.models is of type ", type(dealer.models))
-#            print("dealer.models:", dealer.models)
-
-#        print("dealerships is of type ", type(dealerships))
-#        print("post-dealerships:", dealerships)
 
         context["dealership_models_list"] = dealerships
 
