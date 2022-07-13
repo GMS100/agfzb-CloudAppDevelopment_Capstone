@@ -44,18 +44,13 @@ def post_request(url, json_payload, **kwargs):
     print("post_request: " + "GET from {} ".format(url))
     try:
         # Call post method of requests library without auth
-#        response = requests.post(url, headers={'Content-Type': 'application/json'},
-#                                    json=json_payload, params=kwargs)
         response = requests.post(url, params=kwargs, json=json_payload)
-        print("post_request: status_code=", response.status_code)
     except:
         # If any error occurs
         print("post_request: Network exception occurred")
     status_code = response.status_code
     print("post_request: With status {} ".format(status_code))
-    print("post_request: response=", response)
     json_data = json.loads(response.text)
-    print("post_request: json_data from POST: ", json_data)
     return json_data
 
 # Create a get_dealers_from_cf method to get dealers from a cloud function

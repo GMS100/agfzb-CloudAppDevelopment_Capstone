@@ -162,23 +162,19 @@ def add_review(request, id):
     context["dealer"] = dealer
 
     if request.method == 'GET':
-        print("add_review: GET request=", request)
         # Get cars by dealer and add to context
 #        cars = CarModel.objects.all()
         cars = CarModel.objects.filter(dealerID=id)
         context["cars"] = cars      
-        print("add_review: context to be returned from GET=")
-        print(context) 
         return render(request, 'djangoapp/add_review.html', context)
     elif request.method == 'POST':
-        print("add_review: POST request=", request)
         # Get user information from request.POST
         if request.user.is_authenticated:
             username = request.user.username
             # Create review object
             review = dict()
-            car_id = request.POST["car"]
-            car = CarModel.objects.get(pk=car_id)
+#            car_id = request.POST["car"]
+#            car = CarModel.objects.get(pk=car_id)
             review["dealership"] = id
             review["name"] = username
             # Set review id to the date/time saved
@@ -186,6 +182,8 @@ def add_review(request, id):
             review["review"] = request.POST["content"]
             if "purchasecheck" in request.POST:
                 if request.POST["purchasecheck"] == 'on':
+                    car_id = request.POST["car"]
+                    car = CarModel.objects.get(pk=car_id)
                     review["purchase"] = "true"
                     review["purchase_date"] = request.POST["purchasedate"]
                     review["car_make"] = car.make.name
@@ -199,12 +197,8 @@ def add_review(request, id):
                 review["car_year"] = ""
 
             review_url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/review"
-            print("add_review: calling post_request id=", id)
-            print("add_review: calling post_request review_url=", review_url)
-            print("add_review: calling post_request payload=", review)
             response = post_request(review_url, review, id=id)
 
-            print("add_review: post_request response=", response)
             return redirect("djangoapp:dealer_details", id=id)
         else: 
             response =  [{"statusCode":"404"},{"message":"Please login to add a review"}]
@@ -212,3 +206,38 @@ def add_review(request, id):
         response = [{"statusCode":"404"},{"message":"Not a GET or POST request"}]
 
     return HttpResponse(response)
+
+# Create a view to show models sold by 
+# each dealer 
+# *** Not performed efficiently ***
+# def models_by_dealer(request):
+# ...
+def get_dealers_models(request):
+    if request.method == "GET":
+        # Context will contain the dealership and CarModels objects
+        context = {}
+        url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
+        
+        # Get dealers from the URL and add to context
+#        dealerships = get_dealers_from_cf(url)
+        dealerships = get_dealers_by_state(url, "TX")
+
+        # Go through dealer objects and add model list
+        for dealer in dealerships:
+            cars = CarModel.objects.filter(dealerID=dealer.id)
+            
+            for car in cars:
+                dealer.models.append(car)
+#            print("cars is of type ", type(list(cars)))
+#            print("cars:", cars)
+#            dealer.models.append(list(cars))
+#            print("dealer is of type ", type(dealer))
+#            print("dealer.models is of type ", type(dealer.models))
+#            print("dealer.models:", dealer.models)
+
+#        print("dealerships is of type ", type(dealerships))
+#        print("post-dealerships:", dealerships)
+
+        context["dealership_models_list"] = dealerships
+
+        return render(request, 'djangoapp/dealers_models.html', context)

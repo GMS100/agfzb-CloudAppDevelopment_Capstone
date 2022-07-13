@@ -70,6 +70,8 @@ class CarDealer:
         self.st = st
         # Dealer zip
         self.zip = zip
+        # Models for dealers_models only
+        self.models = []
 
     def __str__(self):
         return "Dealer name: " + self.full_name
