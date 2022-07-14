@@ -119,8 +119,10 @@ def get_dealership_by_id(request, id):
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     if request.method == "GET":
-        # Context will contain the dealership objects
         context = {}
+        if request.GET.get("dealerId"):
+            return get_dealer_details(request, request.GET.get("dealerId"))
+        # Context will contain the dealership objects
         url = "https://49b0e2fc.us-south.apigw.appdomain.cloud/api/dealership/dealer-get"
         
         # Get dealers from the URL and add to context
@@ -128,6 +130,12 @@ def get_dealerships(request):
         context["dealership_list"] = dealerships
 
         return render(request, 'djangoapp/index.html', context)
+
+def get_dealer_details_query(request):
+    print("in get_dealer_details_query")
+    if request.method == "GET":
+        dealerId = request.GET['dealerId']
+        get_dealer_details(request, dealerId)
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
 # def get_dealer_details(request, dealer_id):
@@ -163,7 +171,6 @@ def add_review(request, id):
 
     if request.method == 'GET':
         # Get cars by dealer and add to context
-#        cars = CarModel.objects.all()
         cars = CarModel.objects.filter(dealerID=id)
         context["cars"] = cars      
         return render(request, 'djangoapp/add_review.html', context)
