@@ -26,7 +26,6 @@
                 <li>
                     <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
                     <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
-                    <a class="btn btn-link" href="{% url 'djangoapp:add_review' dealer.id%}">Add Review</a>
                 </li>
                 {% else %}
                 <li>
@@ -57,6 +56,11 @@
             <a class='btn btn-link' href="{% url 'djangoapp:contact' %}"><i class="fa fa-fw fa-envelope"></i>Contact Us</a> 
             <a class='btn btn-link' href="{% url 'djangoapp:about' %}">About Us</a> 
             </div>
+            {% if user.is_authenticated %}
+                {% if user.is_staff %}
+                    <a class='btn btn-link navbar-right' href="{% url 'djangoapp:dealers_models' %}">Dealers with Models</a>
+                {% endif %}
+            {% endif %}
         </div>
     </nav>
 </body>
